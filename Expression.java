@@ -1,3 +1,5 @@
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -9,6 +11,7 @@ public class Expression {
     Expression left;
     Expression right;
     char operator;
+    int matrixSpace;
     Set<Character> atoms = new TreeSet<>();
 
     Expression(String e) {
@@ -104,6 +107,85 @@ public class Expression {
         if (operator == '/') return ((left.evaluate(interpretation) && !right.evaluate(interpretation)) || (!left.evaluate(interpretation) && right.evaluate(interpretation)));
         return false;
     } 
+
+    public int matrixX() {
+        if (isAtom) {
+            return expression.length() + 1;
+        } else {
+            if (left != null) {
+                return expression.length() + left.matrixX() + right.matrixX() + 1;
+            } else {
+                return expression.length() + right.matrixX() + 1;
+            }
+        }
+    }
+
+    public int matrixY() {
+        if (isAtom) {
+            return 1;
+        } else if (operator == '!') {
+            return expression.length() / 2 + right.matrixY() + 1;
+        } else {    
+            return expression.length() / 2 + Integer.max(left.matrixY(), right.matrixY()) + 1;
+        }
+    }
+
+    static void draw(Expression expression) {
+        int matrixX = expression.matrixX();
+        int matrixY = expression.matrixY();
+        int level = 0;
+        char[][] matrix = new char[matrixY][matrixX];
+        for (char[] row : matrix) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                row[j] = ' ';
+            }
+        }
+        Deque<Expression> heightQueue = new ArrayDeque<>();
+        Deque<Expression> queue = new ArrayDeque<>();
+        expression.matrixSpace = matrix[0].length / 2 - expression.expression.length() / 2;
+        heightQueue.add(expression);
+        queue.add(expression);
+        while (!queue.isEmpty()) {
+            int sizeSnapshot = queue.size();
+            int height = 0;
+            for (int i = 0; i < sizeSnapshot; i++) {
+                Expression current = heightQueue.poll();
+                int newHeight = current.expression.length() / 2;
+                if (newHeight > height) height = newHeight;
+                if (current.left != null) heightQueue.add(current.left);
+                if (current.right != null) heightQueue.add(current.right);
+            }
+            for (int i = 0; i < sizeSnapshot; i++) {
+                Expression current = queue.poll();
+                for (int j = current.matrixSpace; j < current.matrixSpace + current.expression.length(); j++) {
+                    matrix[level][j] = current.expression.charAt(j - current.matrixSpace);
+                }
+                if (current.operator == '!') {
+                    for (int j = 0; j < height; j++) matrix[level + 1 + j][current.matrixSpace + height] = '|';
+                    current.right.matrixSpace = current.matrixSpace;
+                    if (current.expression.length() % 2 == 0) current.right.matrixSpace++;
+                    queue.add(current.right);
+                } else if (!current.isAtom) {
+                    int center = current.matrixSpace + current.expression.length() / 2;
+                    for (int j = 1; j <= height; j++) {
+                        matrix[level + j][center - j] = '/';
+                        matrix[level + j][center + j] = '\\';
+                    }
+                    current.left.matrixSpace = current.matrixSpace - 1 - height + (current.expression.length() - current.left.expression.length()) / 2;
+                    current.right.matrixSpace = current.matrixSpace + 1 + height + (current.expression.length() - current.right.expression.length()) / 2;
+                    queue.add(current.left);
+                    queue.add(current.right);
+                }
+            }
+            level += height + 1;
+        }
+        for (char[] row : matrix) {
+            for (char cell: row) {
+                System.out.print(cell);
+            }
+            System.out.print("\n");
+        }
+    }
 
     static void SAT(Expression expression) {
         HashMap<Character, Boolean> interpretation = new HashMap<>();
