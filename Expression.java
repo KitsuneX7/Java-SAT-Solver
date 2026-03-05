@@ -157,21 +157,19 @@ public class Expression {
             }
             for (int i = 0; i < sizeSnapshot; i++) {
                 Expression current = queue.poll();
+                int localMid = current.expression.length() / 2;
                 for (int j = current.matrixSpace; j < current.matrixSpace + current.expression.length(); j++) {
                     matrix[level][j] = current.expression.charAt(j - current.matrixSpace);
                 }
                 if (current.operator == '!') {
-                    for (int j = 0; j < height; j++) matrix[level + 1 + j][current.matrixSpace + height] = '|';
+                    for (int j = 0; j < height; j++) matrix[level + 1 + j][current.matrixSpace + localMid] = '|'; 
                     current.right.matrixSpace = current.matrixSpace;
                     if (current.expression.length() % 2 == 0) current.right.matrixSpace++;
                     queue.add(current.right);
                 } else if (!current.isAtom) {
-                    int center = current.matrixSpace + current.expression.length() / 2;
-                    for (int j = 1; j <= height; j++) {
-                        matrix[level + j][center - j] = '/';
-                        matrix[level + j][center + j] = '\\';
-                    }
-                    current.left.matrixSpace = current.matrixSpace - 1 - height + (current.expression.length() - current.left.expression.length()) / 2;
+                    for (int j = current.matrixSpace - height; j < current.matrixSpace; j++) matrix[level - (j - current.matrixSpace)][j + localMid + 1] = '/';
+                    for (int j = current.matrixSpace; j < current.matrixSpace + height; j++) matrix[level + 1 + (j - current.matrixSpace)][j + localMid + 1] = '\\';
+                    current.left.matrixSpace = current.matrixSpace - height + (current.expression.length() - current.left.expression.length()) / 2;
                     current.right.matrixSpace = current.matrixSpace + 1 + height + (current.expression.length() - current.right.expression.length()) / 2;
                     queue.add(current.left);
                     queue.add(current.right);
