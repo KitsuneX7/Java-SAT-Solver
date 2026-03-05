@@ -9,6 +9,8 @@ This engine parses complex logical expressions, constructs an Abstract Syntax Tr
 * **Bare-Metal Logic:** Implements custom logic gates for `NOT`, `AND`, `OR`, `IMPLIES`, `BICONDITIONAL`, and `XOR`.
 * **Zero Dependencies:** Built purely with standard Java utilities.
 * **Bulletproof Edge-Case Handling:** Heavily filtered against syntax errors and invalid inputs.
+## New in 1.1
+* **Custom ASL tree drawing function:** Allows for visualization of the interpretation function as a tree.
 
 ## Supported Operators
 | Symbol | Logic |
