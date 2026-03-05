@@ -15,7 +15,7 @@ This engine parses complex logical expressions, constructs an Abstract Syntax Tr
 | :---: | :--- |
 | `!` | NOT |
 | `&` | AND |
-| `|` | OR |
+| `\|` | OR |
 | `>` | IMPLIES |
 | `=` | DOUBLE CONDITIONAL |
 | `/` | XOR |
