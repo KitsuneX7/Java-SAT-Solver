@@ -177,9 +177,27 @@ public class Expression {
             }
             level += height + 1;
         }
-        for (char[] row : matrix) {
-            for (char cell: row) {
-                System.out.print(cell);
+        int start = matrix[0].length;
+        int finish = 0;
+        for (char[] row: matrix) {
+            for (int i = 0; i < matrix[0].length; i++) {
+                if (row[i] != ' ') {
+                    if (i < start) start = i;
+                    break;
+                }
+            }
+        }
+        for (char[] row: matrix) {
+            for (int i = matrix[0].length - 1; i >= 0; i--) {
+                if (row[i] != ' ') {
+                    if (i > finish) finish = i;
+                    break;
+                }
+            }
+        }
+        for (char[] row: matrix) {
+            for (int i = start; i <= finish; i++) {
+                System.out.print(row[i]);
             }
             System.out.print("\n");
         }
